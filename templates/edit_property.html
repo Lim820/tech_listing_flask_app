@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Property - Tech Listing</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="/home">
+        <span class="text-danger">Tech</span> <span class="text-black">Listing</span>
+      </a>
+      <div class="d-flex align-items-center gap-3">
+        <a href="/home" class="nav-link fw-semibold text-black">Property</a>
+        <a href="/post_property" class="nav-link fw-semibold text-black">Post Property</a>
+        <a href="/logout" class="nav-link text-danger fw-semibold">Logout</a>
+      </div>
+    </div>
+  </nav>
+  <div class="container py-4">
+    <a href="/property/{{ property.id }}" class="btn btn-outline-primary mb-4">← Back to Property</a>
+    <div class="row justify-content-center">
+      <div class="col-md-7 col-lg-6">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h2 class="h4 text-danger fw-bold mb-4">Edit Property</h2>
+            <form action="/edit_property/{{ property.id }}" method="POST" enctype="multipart/form-data">
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Listing Type</label>
+                <select name="listing_type" class="form-select" required>
+                  <option value="">-- Select Listing Type --</option>
+                  <option value="For Sale" {% if property['listing_type']=='FOR SALE' %}selected{% endif %}>For Sale</option>
+                  <option value="For Rent" {% if property['listing_type']=='FOR RENT' %}selected{% endif %}>For Rent</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">State</label>
+                <select name="state" class="form-select" required>
+                  <option value="">-- Select State --</option>
+                  {% for s in states %}
+                  <option value="{{ s }}" {% if property['state']==s %}selected{% endif %}>{{ s }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="row mb-3">
+                <div class="col">
+                  <label class="form-label fw-semibold">Title</label>
+                  <input type="text" name="title" class="form-control" value="{{ property['title'] }}" required>
+                </div>
+                <div class="col">
+                  <label class="form-label fw-semibold">Price (RM)</label>
+                  <input type="number" name="price" class="form-control" value="{{ property['price'] }}" required>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Type</label>
+                <select name="type" class="form-select" id="typeSelect" required onchange="toggleSubtype()">
+                  <option value="">-- SELECT TYPE --</option>
+                  <option value="RESIDENTIAL" {% if property['type']=='RESIDENTIAL' %}selected{% endif %}>RESIDENTIAL</option>
+                  <option value="FACTORY" {% if property['type']=='FACTORY' %}selected{% endif %}>FACTORY</option>
+                  <option value="COMMERCIAL" {% if property['type']=='COMMERCIAL' %}selected{% endif %}>COMMERCIAL</option>
+                  <option value="LAND" {% if property['type']=='LAND' %}selected{% endif %}>LAND</option>
+                  <option value="HIGH RISE" {% if property['type']=='HIGH RISE' %}selected{% endif %}>HIGH RISE</option>
+                </select>
+              </div>
+              <!-- High Rise Subtype -->
+              <div class="mb-3" id="highRiseSubtypeDiv" style="display:none;">
+                <label class="form-label fw-semibold">High Rise Subtype</label>
+                <select name="high_rise_subtype" class="form-select">
+                  <option value="">-- SELECT HIGH RISE SUBTYPE --</option>
+                  <option value="CONDOMINIUM" {% if property['high_rise_subtype']=='CONDOMINIUM' %}selected{% endif %}>CONDOMINIUM</option>
+                  <option value="APARTMENT" {% if property['high_rise_subtype']=='APARTMENT' %}selected{% endif %}>APARTMENT</option>
+                  <option value="FLAT" {% if property['high_rise_subtype']=='FLAT' %}selected{% endif %}>FLAT</option>
+                </select>
+              </div>
+              <!-- Residential Subtype -->
+              <div class="mb-3" id="residentialSubtypeDiv" style="display:none;">
+                <label class="form-label fw-semibold">Residential Subtype</label>
+                <select name="residential_subtype" class="form-select" id="residentialSubtypeSelect" onchange="toggleResidentialDetailSubtype()">
+                  <option value="">-- SELECT RESIDENTIAL SUBTYPE --</option>
+                  <option value="TERRACE HOUSE" {% if property['residential_subtype']=='TERRACE HOUSE' %}selected{% endif %}>TERRACE HOUSE</option>
+                  <option value="SEMI D" {% if property['residential_subtype']=='SEMI D' %}selected{% endif %}>SEMI D</option>
+                  <option value="BANGALOW" {% if property['residential_subtype']=='BANGALOW' %}selected{% endif %}>BANGALOW</option>
+                </select>
+              </div>
+              <!-- Terrace House Subtype -->
+              <div class="mb-3" id="terraceHouseSubtypeDiv" style="display:none;">
+                <label class="form-label fw-semibold">Terrace House Subtype</label>
+                <select name="terrace_house_subtype" class="form-select">
+                  <option value="">-- SELECT TERRACE HOUSE SUBTYPE --</option>
+                  <option value="1 STOREY" {% if property['terrace_house_subtype']=='1 STOREY' %}selected{% endif %}>1 STOREY</option>
+                  <option value="1.5 STOREY" {% if property['terrace_house_subtype']=='1.5 STOREY' %}selected{% endif %}>1.5 STOREY</option>
+                  <option value="2 STOREY" {% if property['terrace_house_subtype']=='2 STOREY' %}selected{% endif %}>2 STOREY</option>
+                  <option value="2.5 STOREY" {% if property['terrace_house_subtype']=='2.5 STOREY' %}selected{% endif %}>2.5 STOREY</option>
+                  <option value="3 STOREY" {% if property['terrace_house_subtype']=='3 STOREY' %}selected{% endif %}>3 STOREY</option>
+                  <option value="1 STOREY CORNER" {% if property['terrace_house_subtype']=='1 STOREY CORNER' %}selected{% endif %}>1 STOREY CORNER</option>
+                  <option value="1.5 STOREY CORNER" {% if property['terrace_house_subtype']=='1.5 STOREY CORNER' %}selected{% endif %}>1.5 STOREY CORNER</option>
+                  <option value="2 STOREY CORNER" {% if property['terrace_house_subtype']=='2 STOREY CORNER' %}selected{% endif %}>2 STOREY CORNER</option>
+                  <option value="2.5 STOREY CORNER" {% if property['terrace_house_subtype']=='2.5 STOREY CORNER' %}selected{% endif %}>2.5 STOREY CORNER</option>
+                  <option value="3 STOREY CORNER" {% if property['terrace_house_subtype']=='3 STOREY CORNER' %}selected{% endif %}>3 STOREY CORNER</option>
+                </select>
+              </div>
+              <!-- Semi D Subtype -->
+              <div class="mb-3" id="semiDSubtypeDiv" style="display:none;">
+                <label class="form-label fw-semibold">Semi D Subtype</label>
+                <select name="semi_d_subtype" class="form-select">
+                  <option value="">-- SELECT SEMI D SUBTYPE --</option>
+                  <option value="1 STOREY SEMI D" {% if property['semi_d_subtype']=='1 STOREY SEMI D' %}selected{% endif %}>1 STOREY SEMI D</option>
+                  <option value="2 STOREY SEMI D" {% if property['semi_d_subtype']=='2 STOREY SEMI D' %}selected{% endif %}>2 STOREY SEMI D</option>
+                  <option value="2.5 STOREY SEMI D" {% if property['semi_d_subtype']=='2.5 STOREY SEMI D' %}selected{% endif %}>2.5 STOREY SEMI D</option>
+                  <option value="3 STOREY SEMI D" {% if property['semi_d_subtype']=='3 STOREY SEMI D' %}selected{% endif %}>3 STOREY SEMI D</option>
+                  <option value="1 STOREY SEMI D CORNER" {% if property['semi_d_subtype']=='1 STOREY SEMI D CORNER' %}selected{% endif %}>1 STOREY SEMI D CORNER</option>
+                  <option value="2 STOREY SEMI D CORNER" {% if property['semi_d_subtype']=='2 STOREY SEMI D CORNER' %}selected{% endif %}>2 STOREY SEMI D CORNER</option>
+                  <option value="2.5 STOREY SEMI D CORNER" {% if property['semi_d_subtype']=='2.5 STOREY SEMI D CORNER' %}selected{% endif %}>2.5 STOREY SEMI D CORNER</option>
+                  <option value="3 STOREY SEMI D CORNER" {% if property['semi_d_subtype']=='3 STOREY SEMI D CORNER' %}selected{% endif %}>3 STOREY SEMI D CORNER</option>
+                </select>
+              </div>
+              <!-- Bangalow Subtype -->
+              <div class="mb-3" id="bangalowSubtypeDiv" style="display:none;">
+                <label class="form-label fw-semibold">Bangalow Subtype</label>
+                <select name="bangalow_subtype" class="form-select">
+                  <option value="">-- SELECT BANGALOW SUBTYPE --</option>
+                  <option value="1 STOREY BANGALOW" {% if property['bangalow_subtype']=='1 STOREY BANGALOW' %}selected{% endif %}>1 STOREY BANGALOW</option>
+                  <option value="2 STOREY BANGALOW" {% if property['bangalow_subtype']=='2 STOREY BANGALOW' %}selected{% endif %}>2 STOREY BANGALOW</option>
+                  <option value="3 STOREY BANGALOW" {% if property['bangalow_subtype']=='3 STOREY BANGALOW' %}selected{% endif %}>3 STOREY BANGALOW</option>
+                  <option value="1 STOREY BANGALOW CORNER" {% if property['bangalow_subtype']=='1 STOREY BANGALOW CORNER' %}selected{% endif %}>1 STOREY BANGALOW CORNER</option>
+                  <option value="2 STOREY BANGALOW CORNER" {% if property['bangalow_subtype']=='2 STOREY BANGALOW CORNER' %}selected{% endif %}>2 STOREY BANGALOW CORNER</option>
+                  <option value="3 STOREY BANGALOW CORNER" {% if property['bangalow_subtype']=='3 STOREY BANGALOW CORNER' %}selected{% endif %}>3 STOREY BANGALOW CORNER</option>
+                </select>
+              </div>
+              <!-- Commercial Subtype -->
+              <div class="mb-3" id="commercialSubtypeDiv" style="display:none;">
+                <label class="form-label fw-semibold">Commercial Subtype</label>
+                <select name="commercial_subtype" class="form-select">
+                  <option value="">-- SELECT COMMERCIAL SUBTYPE --</option>
+                  <option value="1 STOREY" {% if property['commercial_subtype']=='1 STOREY' %}selected{% endif %}>1 STOREY</option>
+                  <option value="1.5 STOREY" {% if property['commercial_subtype']=='1.5 STOREY' %}selected{% endif %}>1.5 STOREY</option>
+                  <option value="2 STOREY" {% if property['commercial_subtype']=='2 STOREY' %}selected{% endif %}>2 STOREY</option>
+                  <option value="2.5 STOREY" {% if property['commercial_subtype']=='2.5 STOREY' %}selected{% endif %}>2.5 STOREY</option>
+                  <option value="3 STOREY" {% if property['commercial_subtype']=='3 STOREY' %}selected{% endif %}>3 STOREY</option>
+                  <option value="3.5 STOREY" {% if property['commercial_subtype']=='3.5 STOREY' %}selected{% endif %}>3.5 STOREY</option>
+                  <option value="4 STOREY" {% if property['commercial_subtype']=='4 STOREY' %}selected{% endif %}>4 STOREY</option>
+                  <option value="BUILDING" {% if property['commercial_subtype']=='BUILDING' %}selected{% endif %}>BUILDING</option>
+                </select>
+              </div>
+              <!-- Factory Subtype -->
+              <div class="mb-3" id="factorySubtypeDiv" style="display:none;">
+                <label class="form-label fw-semibold">Factory Subtype</label>
+                <select name="factory_subtype" class="form-select" id="factorySubtypeSelect" onchange="toggleFactoryBuildingType()">
+                  <option value="">-- SELECT FACTORY SUBTYPE --</option>
+                  <option value="1 STOREY FACTORY" {% if property['factory_subtype']=='1 STOREY FACTORY' %}selected{% endif %}>1 STOREY FACTORY</option>
+                  <option value="1.5 STOREY FACTORY" {% if property['factory_subtype']=='1.5 STOREY FACTORY' %}selected{% endif %}>1.5 STOREY FACTORY</option>
+                  <option value="2 STOREY FACTORY" {% if property['factory_subtype']=='2 STOREY FACTORY' %}selected{% endif %}>2 STOREY FACTORY</option>
+                  <option value="2.5 STOREY FACTORY" {% if property['factory_subtype']=='2.5 STOREY FACTORY' %}selected{% endif %}>2.5 STOREY FACTORY</option>
+                  <option value="3 STOREY FACTORY" {% if property['factory_subtype']=='3 STOREY FACTORY' %}selected{% endif %}>3 STOREY FACTORY</option>
+                  <option value="3.5 STOREY FACTORY" {% if property['factory_subtype']=='3.5 STOREY FACTORY' %}selected{% endif %}>3.5 STOREY FACTORY</option>
+                </select>
+              </div>
+              <!-- Factory Building Type -->
+              <div class="mb-3" id="factoryBuildingTypeDiv" style="display:none;">
+                <label class="form-label fw-semibold">Factory Building Type</label>
+                <select name="factory_building_type" class="form-select">
+                  <option value="">-- SELECT FACTORY BUILDING TYPE --</option>
+                  <option value="DETACHED FACTORY" {% if property['factory_building_type']=='DETACHED FACTORY' %}selected{% endif %}>DETACHED FACTORY</option>
+                  <option value="SEMI-D FACTORY" {% if property['factory_building_type']=='SEMI-D FACTORY' %}selected{% endif %}>SEMI-D FACTORY</option>
+                  <option value="TERRACE FACTORY" {% if property['factory_building_type']=='TERRACE FACTORY' %}selected{% endif %}>TERRACE FACTORY</option>
+                  <option value="CLUSTER FACTORY" {% if property['factory_building_type']=='CLUSTER FACTORY' %}selected{% endif %}>CLUSTER FACTORY</option>
+                  <option value="BANGLALOW FACTORY" {% if property['factory_building_type']=='BANGLALOW FACTORY' %}selected{% endif %}>BANGLALOW FACTORY</option>
+                </select>
+              </div>
+              <!-- Land Subtype (existing) -->
+              <div class="mb-3" id="landSubtypeDiv" style="display:none;">
+                <label class="form-label fw-semibold">Land Subtype</label>
+                <select name="land_subtype" class="form-select">
+                  <option value="">-- SELECT LAND SUBTYPE --</option>
+                  <option value="AGRICULTURE LAND" {% if property['land_subtype']=='AGRICULTURE LAND' %}selected{% endif %}>AGRICULTURE LAND</option>
+                  <option value="INDUSTRY LAND" {% if property['land_subtype']=='INDUSTRY LAND' %}selected{% endif %}>INDUSTRY LAND</option>
+                  <option value="COMMERCIAL LAND" {% if property['land_subtype']=='COMMERCIAL LAND' %}selected{% endif %}>COMMERCIAL LAND</option>
+                  <option value="RESIDENTIAL LAND" {% if property['land_subtype']=='RESIDENTIAL LAND' %}selected{% endif %}>RESIDENTIAL LAND</option>
+                </select>
+              </div>
+              <script>
+                function toggleSubtype() {
+                  var type = document.getElementById('typeSelect').value;
+                  document.getElementById('landSubtypeDiv').style.display = (type === 'LAND' || (type === '' && '{{ property.land_subtype }}')) ? '' : 'none';
+                  document.getElementById('residentialSubtypeDiv').style.display = (type === 'RESIDENTIAL' || (type === '' && '{{ property.residential_subtype }}')) ? '' : 'none';
+                  document.getElementById('highRiseSubtypeDiv').style.display = (type === 'HIGH RISE' || (type === '' && '{{ property.high_rise_subtype }}')) ? '' : 'none';
+                  document.getElementById('commercialSubtypeDiv').style.display = (type === 'COMMERCIAL' || (type === '' && '{{ property.commercial_subtype }}')) ? '' : 'none';
+                  document.getElementById('factorySubtypeDiv').style.display = (type === 'FACTORY' || (type === '' && '{{ property.factory_subtype }}')) ? '' : 'none';
+                  document.getElementById('factoryBuildingTypeDiv').style.display = 'none';
+                  document.getElementById('terraceHouseSubtypeDiv').style.display = 'none';
+                  document.getElementById('semiDSubtypeDiv').style.display = 'none';
+                  document.getElementById('bangalowSubtypeDiv').style.display = 'none';
+                }
+                function toggleFactoryBuildingType() {
+                  var factorySubtype = document.getElementById('factorySubtypeSelect').value;
+                  document.getElementById('factoryBuildingTypeDiv').style.display = factorySubtype !== '' || '{{ property.factory_building_type }}' ? '' : 'none';
+                }
+                function toggleResidentialDetailSubtype() {
+                  var subtype = document.getElementById('residentialSubtypeSelect').value;
+                  document.getElementById('terraceHouseSubtypeDiv').style.display = (subtype === 'TERRACE HOUSE' || (subtype === '' && '{{ property.terrace_house_subtype }}')) ? '' : 'none';
+                  document.getElementById('semiDSubtypeDiv').style.display = (subtype === 'SEMI D' || (subtype === '' && '{{ property.semi_d_subtype }}')) ? '' : 'none';
+                  document.getElementById('bangalowSubtypeDiv').style.display = (subtype === 'BANGALOW' || (subtype === '' && '{{ property.bangalow_subtype }}')) ? '' : 'none';
+                }
+                document.addEventListener('DOMContentLoaded', function() {
+                  toggleSubtype();
+                  toggleResidentialDetailSubtype();
+                  toggleFactoryBuildingType();
+                  document.getElementById('typeSelect').addEventListener('change', toggleSubtype);
+                  document.getElementById('residentialSubtypeSelect').addEventListener('change', toggleResidentialDetailSubtype);
+                  document.getElementById('factorySubtypeSelect').addEventListener('change', toggleFactoryBuildingType);
+                });
+              </script>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Size</label>
+                <div class="input-group">
+                  <input type="text" name="area" class="form-control" placeholder="e.g. 1200" value="{{ property['area'] }}" required>
+                  <select name="size_unit" class="form-select" style="max-width:120px;">
+                    <option value="SQFT">SQFT</option>
+                    <option value="ACRES">ACRES</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Address</label>
+                <input type="text" name="address" class="form-control" value="{{ property['address'] }}" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Description</label>
+                <textarea name="description" class="form-control" rows="3" required>{{ property['description'] }}</textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Add New Photo(s)</label>
+                <input type="file" name="photos" class="form-control mb-2" accept="image/*" multiple>
+              </div>
+              <button type="submit" class="btn btn-danger w-100">Update Property</button>
+            </form>
+            <!-- Show current property photos with delete buttons (outside the main form) -->
+            <div class="mb-3 mt-4">
+              <label class="form-label fw-semibold">Current Photos</label>
+              <div class="d-flex flex-wrap gap-3">
+                {% for img in property.images %}
+                  <div class="position-relative" style="width:120px;">
+                    <img src="/static/uploads/{{ img }}" class="img-thumbnail" style="width:100%;height:90px;object-fit:cover;">
+                    <form action="/delete_property_photo/{{ property.id }}/{{ img }}" method="POST" style="position:absolute;top:2px;right:2px;">
+                      <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this photo?')">&times;</button>
+                    </form>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

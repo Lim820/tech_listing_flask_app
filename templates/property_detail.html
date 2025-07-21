@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ property.title }} - Property Details</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .navbar-brand .brand-tech { color: #dc3545; }
+    .navbar-brand .brand-listing { color: #000; }
+    .nav-link:hover, .nav-link.fw-semibold:hover {
+      color: #ffc107 !important;
+    }
+    .nav-link.text-danger:hover, .nav-link.fw-semibold.text-danger:hover {
+      color: #b71c1c !important;
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="/home">
+        <span class="brand-tech">Tech</span> <span class="brand-listing">Listing</span>
+      </a>
+      <div class="d-flex align-items-center gap-3">
+        <a href="/home" class="nav-link fw-semibold text-black">Property</a>
+        <a href="/post_property" class="nav-link fw-semibold text-black">Post Property</a>
+        <a href="/logout" class="nav-link text-danger fw-semibold">Logout</a>
+      </div>
+    </div>
+  </nav>
+  <div class="container py-4">
+    <a href="/home" class="btn btn-outline-primary mb-4">← Back to Home</a>
+    <div class="row">
+      <div class="col-lg-7">
+        {% if property.images and property.images|length > 0 %}
+        <div id="propertyCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            {% for img in property.images %}
+            <div class="carousel-item {% if loop.index0 == 0 %}active{% endif %}">
+              <img src="{{ url_for('static', filename='uploads/' ~ img) }}" class="d-block w-100 rounded" alt="Property Image" style="object-fit:cover;max-height:500px;">
+            </div>
+            {% endfor %}
+          </div>
+          {% if property.images|length > 1 %}
+          <button class="carousel-control-prev" type="button" data-bs-target="#propertyCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#propertyCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+          {% endif %}
+        </div>
+        {% endif %}
+        {% if property.listing_type %}
+        <span class="badge bg-primary mb-2">{{ property.listing_type }}</span>
+        {% endif %}
+        <h2 class="fw-bold text-black mb-3">{{ property.title }}</h2>
+        <p><span class="text-danger fw-bold">Price:</span> RM {{ '{:,}'.format(property.price|int) }}</p>
+        <p><span class="text-danger fw-bold">Type:</span> {{ property.type }}
+        {% if property.terrace_house_subtype %}<span class="fw-bold text-primary ms-2">({{ property.terrace_house_subtype }})</span>{% endif %}
+        {% if property.semi_d_subtype %}<span class="fw-bold text-primary ms-2">({{ property.semi_d_subtype }})</span>{% endif %}
+        {% if property.bangalow_subtype %}<span class="fw-bold text-primary ms-2">({{ property.bangalow_subtype }})</span>{% endif %}
+        {% if property.land_subtype %}<span class="fw-bold text-primary ms-2">({{ property.land_subtype }})</span>{% endif %}
+        {% if property.high_rise_subtype %}<span class="fw-bold text-primary ms-2">({{ property.high_rise_subtype }})</span>{% endif %}
+        {% if property.residential_subtype %}<span class="fw-bold text-primary ms-2">({{ property.residential_subtype }})</span>{% endif %}
+        </p>
+        <p><span class="text-danger fw-bold">Size:</span> {{ property.area }}{% if property.size_unit %} <span class="text-secondary">{{ property.size_unit }}</span>{% endif %}</p>
+        <p><span class="text-danger fw-bold">State:</span> {{ property.state }}</p>
+        <p><span class="text-danger fw-bold">Address:</span> {{ property.address }}</p>
+        <p class="text-muted">{{ property.description }}</p>
+        <p class="text-muted small mt-2"><strong>Posted by:</strong> {{ property.posted_by }}</p>
+        {% if session['user_id'] == property.created_by or session['email'] == 'user@example.com' %}
+        <a href="/edit_property/{{ property.id }}" class="btn btn-warning mb-3">Edit</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

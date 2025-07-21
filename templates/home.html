@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard - Tech Listing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light text-dark">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="/home">
+        <span class="text-danger">Tech</span> Listing
+      </a>
+      <div class="d-flex align-items-center gap-3">
+        <a href="/home" class="nav-link fw-semibold text-black">Property</a>
+        <a href="/post_property" class="nav-link fw-semibold text-black">Post Property</a>
+        {% if is_admin %}
+        <a href="/admin/logins" class="nav-link fw-semibold text-primary">Admin: Login Attempts</a>
+        {% endif %}
+        <a href="/logout" class="nav-link text-danger fw-semibold">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <div class="container py-4">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert alert-success" role="alert">
+          {{ messages[0] }}
+        </div>
+      {% endif %}
+    {% endwith %}
+    <!-- Search Bar -->
+    <form method="get" class="mb-4">
+      <div class="row g-2 align-items-center">
+        <div class="col-auto">
+          <input type="text" name="search" class="form-control" placeholder="Search by area, state, or address" value="{{ request.args.get('search', '') }}">
+        </div>
+        <div class="col-auto">
+          <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+      </div>
+    </form>
+    <!-- Filter by Poster Email (with datalist) -->
+    <form method="get" class="mb-4">
+      <div class="row g-2 align-items-center">
+        <div class="col-auto">
+          <label for="filter_email" class="col-form-label">Filter by Poster Email:</label>
+        </div>
+        <div class="col-auto">
+          <input list="email_options" name="filter_email" id="filter_email" class="form-control" placeholder="Type or select email" value="{{ request.args.get('filter_email', '') }}" onchange="this.form.submit()">
+          <datalist id="email_options">
+            {% for user_email in all_users %}
+            <option value="{{ user_email }}">
+            {% endfor %}
+          </datalist>
+        </div>
+        <div class="col-auto">
+          <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+      </div>
+    </form>
+    <!-- Type/Subtype Filters (Hierarchical) -->
+    <form method="get" class="mb-4">
+      <div class="row g-2 align-items-center">
+        <div class="col-auto">
+          <label for="filter_type" class="col-form-label">Type:</label>
+        </div>
+        <div class="col-auto">
+          <select name="filter_type" id="filter_type" class="form-select" onchange="this.form.submit()">
+            <option value="">All Types</option>
+            {% for t in all_types %}
+            <option value="{{ t }}" {% if filter_type == t %}selected{% endif %}>{{ t|upper }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% if filter_type == 'Residential' %}
+        <div class="col-auto">
+          <label for="filter_residential_subtype" class="col-form-label">Residential Subtype:</label>
+        </div>
+        <div class="col-auto">
+          <select name="filter_residential_subtype" id="filter_residential_subtype" class="form-select" onchange="this.form.submit()">
+            <option value="">All Residential Subtypes</option>
+            {% for st in residential_subtypes %}
+            <option value="{{ st }}" {% if filter_residential_subtype == st %}selected{% endif %}>{{ st|upper }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% if filter_residential_subtype == 'Terrace House' %}
+        <div class="col-auto">
+          <label for="filter_terrace_house_subtype" class="col-form-label">Terrace House Subtype:</label>
+        </div>
+        <div class="col-auto">
+          <select name="filter_terrace_house_subtype" id="filter_terrace_house_subtype" class="form-select" onchange="this.form.submit()">
+            <option value="">All Terrace House Subtypes</option>
+            {% for st in terrace_house_subtypes %}
+            <option value="{{ st }}" {% if filter_terrace_house_subtype == st %}selected{% endif %}>{{ st|upper }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+        {% if filter_residential_subtype == 'Semi D' %}
+        <div class="col-auto">
+          <label for="filter_semi_d_subtype" class="col-form-label">Semi D Subtype:</label>
+        </div>
+        <div class="col-auto">
+          <select name="filter_semi_d_subtype" id="filter_semi_d_subtype" class="form-select" onchange="this.form.submit()">
+            <option value="">All Semi D Subtypes</option>
+            {% for st in semi_d_subtypes %}
+            <option value="{{ st }}" {% if filter_semi_d_subtype == st %}selected{% endif %}>{{ st|upper }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+        {% if filter_residential_subtype == 'Bangalow' %}
+        <div class="col-auto">
+          <label for="filter_bangalow_subtype" class="col-form-label">Bangalow Subtype:</label>
+        </div>
+        <div class="col-auto">
+          <select name="filter_bangalow_subtype" id="filter_bangalow_subtype" class="form-select" onchange="this.form.submit()">
+            <option value="">All Bangalow Subtypes</option>
+            {% for st in bangalow_subtypes %}
+            <option value="{{ st }}" {% if filter_bangalow_subtype == st %}selected{% endif %}>{{ st|upper }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+        {% endif %}
+        {% if filter_type == 'Land' %}
+        <div class="col-auto">
+          <label for="filter_land_subtype" class="col-form-label">Land Subtype:</label>
+        </div>
+        <div class="col-auto">
+          <select name="filter_land_subtype" id="filter_land_subtype" class="form-select" onchange="this.form.submit()">
+            <option value="">All Land Subtypes</option>
+            {% for st in land_subtypes %}
+            <option value="{{ st }}" {% if filter_land_subtype == st %}selected{% endif %}>{{ st|upper }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+        {% if filter_type == 'High Rise' %}
+        <div class="col-auto">
+          <label for="filter_high_rise_subtype" class="col-form-label">High Rise Subtype:</label>
+        </div>
+        <div class="col-auto">
+          <select name="filter_high_rise_subtype" id="filter_high_rise_subtype" class="form-select" onchange="this.form.submit()">
+            <option value="">All High Rise Subtypes</option>
+            {% for st in high_rise_subtypes %}
+            <option value="{{ st }}" {% if filter_high_rise_subtype == st %}selected{% endif %}>{{ st|upper }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+      </div>
+    </form>
+    <!-- Subtype Counts -->
+    {% if subtype_counts %}
+    <div class="mb-4">
+      <h6 class="fw-bold">Subtype Counts:</h6>
+      <div class="d-flex flex-wrap gap-3">
+        {% for st, count in subtype_counts.items() %}
+        <span class="badge bg-info fs-6">{{ st|upper }}: {{ count }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    <!-- Property Type Counts (already present) -->
+    {% if type_counts %}
+    <div class="mb-4">
+      <h5 class="fw-bold">Property Type Counts:</h5>
+      <div class="d-flex flex-wrap gap-3">
+        {% for t, count in type_counts.items() %}
+        <span class="badge bg-secondary fs-6">{{ t|upper }}: {{ count }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    <!-- Dashboard Greeting -->
+    <div class="mb-4">
+      <h2 class="h4 fw-semibold">Welcome to your Dashboard, {{ email }} 👋</h2>
+      <p class="text-muted">Post a new property or browse by state below.</p>
+    </div>
+
+    <!-- Browse & Properties Section -->
+    <div class="mb-4">
+      <h2 class="h5 fw-semibold mb-2">Browse by State:</h2>
+      <div class="d-flex flex-wrap gap-2 mb-4">
+        {% for s in states %}
+        <a href="/properties/{{ s }}" class="btn btn-outline-secondary btn-sm">{{ s }}</a>
+        {% endfor %}
+      </div>
+
+      <h2 class="h5 fw-semibold mb-2">All Properties</h2>
+      <div class="row g-3">
+        {% for property in properties %}
+        <div class="col-12 col-sm-6 col-lg-4">
+          <div class="card h-100 shadow-sm">
+            {% if property.images and property.images|length > 1 %}
+            <div id="carousel{{ property.id }}" class="carousel slide" data-bs-ride="carousel">
+              <div class="carousel-inner">
+                {% for img in property.images %}
+                <div class="carousel-item {% if loop.index0 == 0 %}active{% endif %}">
+                  <a href="/property/{{ property.id }}">
+                    <img src="{{ url_for('static', filename='uploads/' ~ img) }}" class="d-block w-100 property-img" alt="Property Photo" style="object-fit:cover;max-height:200px;cursor:pointer;">
+                  </a>
+                </div>
+                {% endfor %}
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ property.id }}" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ property.id }}" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+            {% elif property.images and property.images|length == 1 %}
+            <a href="/property/{{ property.id }}">
+              <img src="{{ url_for('static', filename='uploads/' ~ property.images[0]) }}" class="card-img-top property-img" alt="Property Photo" style="object-fit:cover;max-height:200px;cursor:pointer;">
+            </a>
+            {% endif %}
+            <div class="card-body">
+              {% if property['listing_type'] %}
+              <span class="badge bg-primary mb-2 fs-5 py-2 px-3">{{ property['listing_type'] }}</span>
+              {% endif %}
+              <a href="/property/{{ property.id }}" class="text-decoration-none"><h5 class="card-title fw-bold text-black">{{ property['title'] }}</h5></a>
+              <p class="card-text mb-1"><span class="text-danger fw-bold">Price:</span> RM {{ '{:,}'.format(property['price']|int) }}</p>
+              <p class="card-text mb-1"><span class="text-danger fw-bold">Type:</span> {{ property['type']|upper }}
+      {% if property['terrace_house_subtype'] %}<span class="fw-bold text-primary ms-2">({{ property['terrace_house_subtype']|upper }})</span>{% endif %}
+      {% if property['semi_d_subtype'] %}<span class="fw-bold text-primary ms-2">({{ property['semi_d_subtype']|upper }})</span>{% endif %}
+      {% if property['bangalow_subtype'] %}<span class="fw-bold text-primary ms-2">({{ property['bangalow_subtype']|upper }})</span>{% endif %}
+      {% if property['land_subtype'] %}<span class="fw-bold text-primary ms-2">({{ property['land_subtype']|upper }})</span>{% endif %}
+      {% if property['high_rise_subtype'] %}<span class="fw-bold text-primary ms-2">({{ property['high_rise_subtype']|upper }})</span>{% endif %}
+      {% if property['residential_subtype'] %}<span class="fw-bold text-primary ms-2">({{ property['residential_subtype']|upper }})</span>{% endif %}
+      {% if property['factory_subtype'] %}<span class="fw-bold text-primary ms-2">({{ property['factory_subtype']|upper }})</span>{% endif %}
+      {% if property['factory_building_type'] %}<span class="fw-bold text-primary ms-2">({{ property['factory_building_type']|upper }})</span>{% endif %}
+      {% if property['commercial_subtype'] %}<span class="fw-bold text-primary ms-2">({{ property['commercial_subtype']|upper }})</span>{% endif %}
+      </p>
+              <p class="card-text mb-1"><span class="text-danger fw-bold">Size:</span> {{ property['area'] }}{% if property['size_unit'] %} <span class="text-secondary">{{ property['size_unit'] }}</span>{% endif %}</p>
+              <p class="card-text mb-1"><span class="text-danger fw-bold">State:</span> {{ property['state'] }}</p>
+              <p class="card-text mb-1"><span class="text-danger fw-bold">Address:</span> {{ property['address'] }}</p>
+              <p class="card-text text-muted small mt-2">{{ property['description'] }}</p>
+              <p class="card-text text-muted small mt-2"><strong>Posted by:</strong> {{ property['posted_by'] }}</p>
+              {% if property['days_ago'] is not none %}
+              <p class="card-text text-muted small">Posted {{ property['days_ago'] }} days ago</p>
+              {% endif %}
+              {% if is_admin or session['user_id']|string == property['created_by']|string %}
+              <a href="/edit_property/{{ property['id'] }}" class="btn btn-warning btn-sm mt-2">Edit</a>
+              {% endif %}
+              {% if is_admin %}
+              <form action="/delete_property/{{ property['id'] }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this property?');">
+                <button type="submit" class="btn btn-sm btn-danger mt-2">Delete</button>
+              </form>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imageModalLabel">Property Image</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="modalImage" src="" alt="Enlarged Property" class="img-fluid rounded">
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var imageModal = document.getElementById('imageModal');
+    var modalImage = document.getElementById('modalImage');
+    document.querySelectorAll('.property-img').forEach(function(img) {
+      img.addEventListener('click', function() {
+        var url = this.getAttribute('data-img-url');
+        modalImage.src = url;
+      });
+    });
+    imageModal.addEventListener('hidden.bs.modal', function () {
+      modalImage.src = '';
+    });
+  });
+</script>
+</body>
+</html>

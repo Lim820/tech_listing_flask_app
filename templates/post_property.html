@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Post Property - Tech Listing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light text-dark">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="/home">
+        <span class="text-danger">Tech</span> Listing
+      </a>
+      <div class="d-flex align-items-center gap-3">
+        <a href="/home" class="nav-link fw-semibold">Property</a>
+        <a href="/post_property" class="nav-link fw-semibold">Post Property</a>
+        <a href="/logout" class="nav-link text-danger fw-semibold">Logout</a>
+      </div>
+    </div>
+  </nav>
+  <div class="container py-4">
+    <div class="row justify-content-center">
+      <div class="col-md-7 col-lg-6">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h2 class="h4 text-danger fw-bold mb-4">Post New Property</h2>
+            <form action="/post_property" method="POST" enctype="multipart/form-data">
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Listing Type</label>
+                <select name="listing_type" class="form-select" required>
+                  <option value="">-- Select Listing Type --</option>
+                  <option value="For Sale">For Sale</option>
+                  <option value="For Rent">For Rent</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">State</label>
+                <select name="state" class="form-select" required>
+                  <option value="">-- Select State --</option>
+                  {% for s in states %}
+                  <option value="{{ s }}">{{ s }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="row mb-3">
+                <div class="col">
+                  <label class="form-label fw-semibold">Title</label>
+                  <input type="text" name="title" class="form-control" required>
+                </div>
+                <div class="col">
+                  <label class="form-label fw-semibold">Price (RM)</label>
+                  <input type="number" name="price" class="form-control" required>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Type</label>
+                <select name="type" class="form-select" id="typeSelect" required onchange="toggleSubtype()">
+                  <option value="">-- SELECT TYPE --</option>
+                  <option value="RESIDENTIAL">RESIDENTIAL</option>
+                  <option value="FACTORY">FACTORY</option>
+                  <option value="COMMERCIAL">COMMERCIAL</option>
+                  <option value="LAND">LAND</option>
+                  <option value="HIGH RISE">HIGH RISE</option>
+                </select>
+              </div>
+              <!-- High Rise Subtype -->
+              <div class="mb-3" id="highRiseSubtypeDiv" style="display:none;">
+                <label class="form-label fw-semibold">High Rise Subtype</label>
+                <select name="high_rise_subtype" class="form-select">
+                  <option value="">-- SELECT HIGH RISE SUBTYPE --</option>
+                  <option value="CONDOMINIUM">CONDOMINIUM</option>
+                  <option value="APARTMENT">APARTMENT</option>
+                  <option value="FLAT">FLAT</option>
+                </select>
+              </div>
+              <!-- Residential Subtype -->
+              <div class="mb-3" id="residentialSubtypeDiv" style="display:none;">
+                <label class="form-label fw-semibold">Residential Subtype</label>
+                <select name="residential_subtype" class="form-select" id="residentialSubtypeSelect" onchange="toggleResidentialDetailSubtype()">
+                  <option value="">-- SELECT RESIDENTIAL SUBTYPE --</option>
+                  <option value="TERRACE HOUSE">TERRACE HOUSE</option>
+                  <option value="SEMI D">SEMI D</option>
+                  <option value="BANGALOW">BANGALOW</option>
+                </select>
+              </div>
+              <!-- Terrace House Subtype -->
+              <div class="mb-3" id="terraceHouseSubtypeDiv" style="display:none;">
+                <label class="form-label fw-semibold">Terrace House Subtype</label>
+                <select name="terrace_house_subtype" class="form-select">
+                  <option value="">-- SELECT TERRACE HOUSE SUBTYPE --</option>
+                  <option value="1 STOREY">1 STOREY</option>
+                  <option value="1.5 STOREY">1.5 STOREY</option>
+                  <option value="2 STOREY">2 STOREY</option>
+                  <option value="2.5 STOREY">2.5 STOREY</option>
+                  <option value="3 STOREY">3 STOREY</option>
+                  <option value="1 STOREY CORNER">1 STOREY CORNER</option>
+                  <option value="1.5 STOREY CORNER">1.5 STOREY CORNER</option>
+                  <option value="2 STOREY CORNER">2 STOREY CORNER</option>
+                  <option value="2.5 STOREY CORNER">2.5 STOREY CORNER</option>
+                  <option value="3 STOREY CORNER">3 STOREY CORNER</option>
+                </select>
+              </div>
+              <!-- Semi D Subtype -->
+              <div class="mb-3" id="semiDSubtypeDiv" style="display:none;">
+                <label class="form-label fw-semibold">Semi D Subtype</label>
+                <select name="semi_d_subtype" class="form-select">
+                  <option value="">-- SELECT SEMI D SUBTYPE --</option>
+                  <option value="1 STOREY SEMI D">1 STOREY SEMI D</option>
+                  <option value="2 STOREY SEMI D">2 STOREY SEMI D</option>
+                  <option value="2.5 STOREY SEMI D">2.5 STOREY SEMI D</option>
+                  <option value="3 STOREY SEMI D">3 STOREY SEMI D</option>
+                  <option value="1 STOREY SEMI D CORNER">1 STOREY SEMI D CORNER</option>
+                  <option value="2 STOREY SEMI D CORNER">2 STOREY SEMI D CORNER</option>
+                  <option value="2.5 STOREY SEMI D CORNER">2.5 STOREY SEMI D CORNER</option>
+                  <option value="3 STOREY SEMI D CORNER">3 STOREY SEMI D CORNER</option>
+                </select>
+              </div>
+              <!-- Bangalow Subtype -->
+              <div class="mb-3" id="bangalowSubtypeDiv" style="display:none;">
+                <label class="form-label fw-semibold">Bangalow Subtype</label>
+                <select name="bangalow_subtype" class="form-select">
+                  <option value="">-- SELECT BANGALOW SUBTYPE --</option>
+                  <option value="1 STOREY BANGALOW">1 STOREY BANGALOW</option>
+                  <option value="2 STOREY BANGALOW">2 STOREY BANGALOW</option>
+                  <option value="3 STOREY BANGALOW">3 STOREY BANGALOW</option>
+                  <option value="1 STOREY BANGALOW CORNER">1 STOREY BANGALOW CORNER</option>
+                  <option value="2 STOREY BANGALOW CORNER">2 STOREY BANGALOW CORNER</option>
+                  <option value="3 STOREY BANGALOW CORNER">3 STOREY BANGALOW CORNER</option>
+                </select>
+              </div>
+              <!-- Commercial Subtype -->
+              <div class="mb-3" id="commercialSubtypeDiv" style="display:none;">
+                <label class="form-label fw-semibold">Commercial Subtype</label>
+                <select name="commercial_subtype" class="form-select">
+                  <option value="">-- SELECT COMMERCIAL SUBTYPE --</option>
+                  <option value="1 STOREY">1 STOREY</option>
+                  <option value="1.5 STOREY">1.5 STOREY</option>
+                  <option value="2 STOREY">2 STOREY</option>
+                  <option value="2.5 STOREY">2.5 STOREY</option>
+                  <option value="3 STOREY">3 STOREY</option>
+                  <option value="3.5 STOREY">3.5 STOREY</option>
+                  <option value="4 STOREY">4 STOREY</option>
+                  <option value="BUILDING">BUILDING</option>
+                </select>
+              </div>
+              <!-- Factory Subtype -->
+              <div class="mb-3" id="factorySubtypeDiv" style="display:none;">
+                <label class="form-label fw-semibold">Factory Subtype</label>
+                <select name="factory_subtype" class="form-select" id="factorySubtypeSelect" onchange="toggleFactoryBuildingType()">
+                  <option value="">-- SELECT FACTORY SUBTYPE --</option>
+                  <option value="1 STOREY FACTORY">1 STOREY FACTORY</option>
+                  <option value="1.5 STOREY FACTORY">1.5 STOREY FACTORY</option>
+                  <option value="2 STOREY FACTORY">2 STOREY FACTORY</option>
+                  <option value="2.5 STOREY FACTORY">2.5 STOREY FACTORY</option>
+                  <option value="3 STOREY FACTORY">3 STOREY FACTORY</option>
+                  <option value="3.5 STOREY FACTORY">3.5 STOREY FACTORY</option>
+                </select>
+              </div>
+              <!-- Factory Building Type -->
+              <div class="mb-3" id="factoryBuildingTypeDiv" style="display:none;">
+                <label class="form-label fw-semibold">Factory Building Type</label>
+                <select name="factory_building_type" class="form-select">
+                  <option value="">-- SELECT FACTORY BUILDING TYPE --</option>
+                  <option value="DETACHED FACTORY">DETACHED FACTORY</option>
+                  <option value="SEMI-D FACTORY">SEMI-D FACTORY</option>
+                  <option value="TERRACE FACTORY">TERRACE FACTORY</option>
+                  <option value="CLUSTER FACTORY">CLUSTER FACTORY</option>
+                  <option value="BANGLALOW FACTORY">BANGLALOW FACTORY</option>
+                </select>
+              </div>
+              <!-- Land Subtype (existing) -->
+              <div class="mb-3" id="landSubtypeDiv" style="display:none;">
+                <label class="form-label fw-semibold">Land Subtype</label>
+                <select name="land_subtype" class="form-select">
+                  <option value="">-- SELECT LAND SUBTYPE --</option>
+                  <option value="AGRICULTURE LAND">AGRICULTURE LAND</option>
+                  <option value="INDUSTRY LAND">INDUSTRY LAND</option>
+                  <option value="COMMERCIAL LAND">COMMERCIAL LAND</option>
+                  <option value="RESIDENTIAL LAND">RESIDENTIAL LAND</option>
+                </select>
+              </div>
+              <script>
+                function toggleSubtype() {
+                  var type = document.getElementById('typeSelect').value;
+                  document.getElementById('landSubtypeDiv').style.display = (type === 'LAND') ? '' : 'none';
+                  document.getElementById('residentialSubtypeDiv').style.display = (type === 'RESIDENTIAL') ? '' : 'none';
+                  document.getElementById('highRiseSubtypeDiv').style.display = (type === 'HIGH RISE') ? '' : 'none';
+                  document.getElementById('commercialSubtypeDiv').style.display = (type === 'COMMERCIAL') ? '' : 'none';
+                  document.getElementById('factorySubtypeDiv').style.display = (type === 'FACTORY') ? '' : 'none';
+                  document.getElementById('factoryBuildingTypeDiv').style.display = 'none';
+                  document.getElementById('terraceHouseSubtypeDiv').style.display = 'none';
+                  document.getElementById('semiDSubtypeDiv').style.display = 'none';
+                  document.getElementById('bangalowSubtypeDiv').style.display = 'none';
+                }
+                function toggleFactoryBuildingType() {
+                  var factorySubtype = document.getElementById('factorySubtypeSelect').value;
+                  document.getElementById('factoryBuildingTypeDiv').style.display = factorySubtype !== '' ? '' : 'none';
+                }
+                function toggleResidentialDetailSubtype() {
+                  var subtype = document.getElementById('residentialSubtypeSelect').value;
+                  document.getElementById('terraceHouseSubtypeDiv').style.display = (subtype === 'TERRACE HOUSE') ? '' : 'none';
+                  document.getElementById('semiDSubtypeDiv').style.display = (subtype === 'SEMI D') ? '' : 'none';
+                  document.getElementById('bangalowSubtypeDiv').style.display = (subtype === 'BANGALOW') ? '' : 'none';
+                }
+                document.addEventListener('DOMContentLoaded', function() {
+                  toggleSubtype();
+                  toggleResidentialDetailSubtype();
+                  document.getElementById('typeSelect').addEventListener('change', toggleSubtype);
+                  document.getElementById('residentialSubtypeSelect').addEventListener('change', toggleResidentialDetailSubtype);
+                });
+              </script>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Size</label>
+                <div class="input-group">
+                  <input type="text" name="area" class="form-control" placeholder="e.g. 1200" required>
+                  <select name="size_unit" class="form-select" style="max-width:120px;">
+                    <option value="SQFT">SQFT</option>
+                    <option value="ACRES">ACRES</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Address</label>
+                <input type="text" name="address" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Description</label>
+                <textarea name="description" class="form-control" rows="3" required></textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Property Photos</label>
+                <input type="file" name="photos" class="form-control" accept="image/*" multiple required>
+              </div>
+              <button type="submit" class="btn btn-danger w-100">Post Property</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
